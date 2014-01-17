@@ -11,6 +11,14 @@
 
 EXIT_CODE=0
 
+source `dirname $(readlink -f $0)`/check_pkgs.sh
+PKGS="transifex-client fedpkg"
+check_pkgs $PKGS
+if [ "$?" -eq "1" ]; then
+  exit 1
+fi
+
+
 print_help ()
 {
   echo "Usage: `basename $0` [-h] [-l lang] [-f fver] [-d]"
@@ -21,46 +29,6 @@ print_help ()
   echo "    -f specify fedora version. for example: f20"
   echo "    -d enable debugging"
   exit $EXIT_CODE
-}
-
-black='\E[0;30m'
-red='\E[0;31m'
-green='\E[0;32m'
-
-# color-echo
-# $1 - message
-# $2 - color
-cecho ()
-{
-  local default_msg="No message passed."
-  message=${1:-$default_msg}   # Defaults to default message.
-  color=${2:-$black}           # Defaults to black, if not specified.
-  echo -ne "$color"
-  echo "$message"
-  tput sgr0
-  return
-} 
-
-check_pkgs ()
-{
-  local failed=0
-  for pkg in "$@"
-  do
-    echo "Checking for $pkg.."
-    rpm -q $pkg &>/dev/null
-    if [ $? -eq 1 ]; then
-      cecho "-> Install $pkg!" $red
-      let failed++
-    else
-      cecho "-> Found $pkg" $green
-    fi
-  done
-  if [ $failed -gt 0 ]; then
-    EXIT_CODE=1
-    exit $EXIT_CODE
-  else
-    return
-  fi
 }
 
 while getopts "hdl:f:" opts; do
@@ -82,9 +50,6 @@ while getopts "hdl:f:" opts; do
       ;;
     esac
 done
-
-PKGS="transifex-client fedpkg"
-check_pkgs $PKGS
 
 if [ -d anaconda ]; then
   rm -rf anaconda
