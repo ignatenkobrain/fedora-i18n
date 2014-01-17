@@ -79,8 +79,9 @@ pushd "$folder"
 popd
 diff -uNr "${folder}.orig" "$folder" > i18n.patch
 rm -rf "$folder" "${folder}.orig"
+sed -i -e "/Release:/s/[0-9]/999/" anaconda.spec
 sed -i -e "s/^\(Source0:.*\)/\1\nPatch0: i18n.patch/g" anaconda.spec
-sed -i -e "s/^\(%setup -q\)/\1\n%patch0 -p1 -b .i18n/g" anaconda.spec
+sed -i -e "s/^\(%setup.*\)/\1\n%patch0 -p1 -b .i18n/g" anaconda.spec
 fedpkg srpm
 
 EXIT_CODE=$?
