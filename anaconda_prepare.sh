@@ -13,13 +13,14 @@ EXIT_CODE=0
 
 print_help ()
 {
-  echo "Usage: `basename $0` [-h] [-l lang] [-d]"
+  echo "Usage: `basename $0` [-h] [-l lang] [-f fver] [-d]"
   echo ""
   echo "where:"
   echo "    -h show this help text"
   echo "    -l specify languages (separate by comma). https://git.fedorahosted.org/cgit/anaconda.git/plain/po/LINGUAS"
+  echo "    -f specify fedora version. for example: f20"
   echo "    -d enable debugging"
-  exit EXIT_CODE
+  exit $EXIT_CODE
 }
 
 black='\E[0;30m'
@@ -56,27 +57,31 @@ check_pkgs ()
   done
   if [ $failed -gt 0 ]; then
     EXIT_CODE=1
-    exit EXIT_CODE
+    exit $EXIT_CODE
   else
     return
   fi
 }
 
-if [ "$#" -gt 0 ]; then
-  if [[ "$1" == "-h" ]]; then
-    print_help
-  elif [[ "$1" == "-d" ]]; then
-    set -x
-  elif [[ "$1" == "-l" ]]; then
-    if [ -z "$2" ]; then
-      echo "Specify languages!"
-      EXIT_CODE=2
+while getopts "hdl:f:" opts; do
+  case "$opts" in
+    h)
       print_help
-    else
-      langs="$2"
-    fi
-  fi
-fi
+      ;;
+    d)
+      set -x
+      ;;
+    l)
+      langs=${OPTARG}
+      ;;
+    f)
+      fver=${OPTARG}
+      ;;
+    *)
+      print_help
+      ;;
+    esac
+done
 
 PKGS="transifex-client fedpkg"
 check_pkgs $PKGS
@@ -85,15 +90,20 @@ if [ -d anaconda ]; then
   rm -rf anaconda
 fi
 
-# XXX: Implement working with non-rawhide branches
-fedpkg clone --anonymous anaconda
+if [ -z "$fver" ]; then
+  fver="master"
+  branch="$fver"
+else
+  branch="$fver-branch"
+fi
+fedpkg clone --anonymous anaconda --branch "$fver"
 cd anaconda
 fedpkg sources
 archive=`basename *.tar.bz2`; folder="${archive%%.tar.bz2}"
 tar xf "$archive"
 pushd "$folder"
   mkdir -p .tx/
-  curl "https://git.fedorahosted.org/cgit/anaconda.git/plain/.tx/config" -o .tx/config
+  curl "https://git.fedorahosted.org/cgit/anaconda.git/plain/.tx/config?h=$branch" -o .tx/config
 popd
 cp -pR "$folder" "${folder}.orig"
 pushd "$folder"
@@ -109,6 +119,7 @@ sed -i -e "s/^\(Source0:.*\)/\1\nPatch0: i18n.patch/g" anaconda.spec
 sed -i -e "s/^\(%setup -q\)/\1\n%patch0 -p1 -b .i18n/g" anaconda.spec
 fedpkg srpm
 
-exit $?
+EXIT_CODE=$?
+exit $EXIT_CODE
 
 # vim:expandtab:tabstop=2:shiftwidth=2:softtabstop=2
