@@ -21,7 +21,7 @@ print_help ()
   exit 0
 }
 
-while getopts "hd:f:" opts; do
+while getopts "hdf:" opts; do
   case "$opts" in
     h)
       print_help
