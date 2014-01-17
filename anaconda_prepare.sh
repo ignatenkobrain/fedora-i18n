@@ -18,7 +18,6 @@ if [ "$?" -eq "1" ]; then
   exit 1
 fi
 
-
 print_help ()
 {
   echo "Usage: `basename $0` [-h] [-l lang] [-f fver] [-d]"
