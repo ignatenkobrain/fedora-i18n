@@ -9,14 +9,17 @@
 # any later version.
 # See http://www.gnu.org/copyleft/gpl.html for the full text of the license.
 
+EXIT_CODE=0
+
 print_help ()
 {
-  echo "Usage: `basename $0` [-h] [-d]"
+  echo "Usage: `basename $0` [-h] [-l lang] [-d]"
   echo ""
   echo "where:"
   echo "    -h show this help text"
+  echo "    -l specify languages (separate by comma). https://git.fedorahosted.org/cgit/anaconda.git/plain/po/LINGUAS"
   echo "    -d enable debugging"
-  exit -1
+  exit EXIT_CODE
 }
 
 black='\E[0;30m'
@@ -52,19 +55,26 @@ check_pkgs ()
     fi
   done
   if [ $failed -gt 0 ]; then
-    exit 1
+    EXIT_CODE=1
+    exit EXIT_CODE
   else
     return
   fi
 }
-
-echo "$1"
 
 if [ "$#" -gt 0 ]; then
   if [[ "$1" == "-h" ]]; then
     print_help
   elif [[ "$1" == "-d" ]]; then
     set -x
+  elif [[ "$1" == "-l" ]]; then
+    if [ -z "$2" ]; then
+      echo "Specify languages!"
+      EXIT_CODE=2
+      print_help
+    else
+      langs="$2"
+    fi
   fi
 fi
 
@@ -87,8 +97,11 @@ pushd "$folder"
 popd
 cp -pR "$folder" "${folder}.orig"
 pushd "$folder"
-  # XXX: Implement download specify translations
-  tx pull -a
+  if [ -z "$langs" ]; then
+    langs=`sed -e "/#/d" -e "s/ /,/g" po/LINGUAS`
+  fi
+  echo "Translation languages to update: $langs"
+  tx pull -l "$langs"
 popd
 diff -uNr "${folder}.orig" "$folder" > i18n.patch
 rm -rf "$folder" "${folder}.orig"
