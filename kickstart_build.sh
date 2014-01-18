@@ -35,7 +35,7 @@ else
 fi
 for arch in $arch
 do
-  setarch $arch livecd-creator $verbose --config=./temp.ks --fslabel=$fver-LiveCD-`date "+%d%m%Y"`_$arch --cache=/var/cache/livecd --releasever=$release
+  setarch $arch livecd-creator $verbose --config=./temp.ks --fslabel=$fver-DVD-`date "+%d%m%Y"`_$arch --cache=/var/cache/livecd --releasever=$release
 done
 
 exit 0
