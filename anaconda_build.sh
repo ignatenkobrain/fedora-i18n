@@ -9,32 +9,20 @@
 # any later version.
 # See http://www.gnu.org/copyleft/gpl.html for the full text of the license.
 
-source `dirname $(readlink -f $0)`/check_pkgs.sh
-check_pkgs "mock" "createrepo"
-if [ "$?" -eq "1" ]; then
-  exit 1
-fi
-
-print_help ()
-{
-  # XXX: implement help
-  exit 0
-}
-
-while getopts "hdf:" opts; do
+while getopts "va:f:" opts; do
   case "$opts" in
-    h)
-      print_help
+    a)
+      arch="$OPTARG"
       ;;
-    d)
-      set -x
+    v)
       verbose="--verbose"
       ;;
     f)
-      fver=${OPTARG}
+      fver=$OPTARG
       ;;
     *)
-      print_help
+      echo "Wrong usage!"
+      exit 1
       ;;
     esac
 done
@@ -42,13 +30,13 @@ done
 if [ -d anaconda/repo ]; then
   rm -rf anaconda/repo
 fi
-mkdir -p anaconda/repo/{SRPMS,x86_64,i386}
-if [ -z "$fver" ]; then
+mkdir -p anaconda/repo/SRPMS
+if [[ "$fver" == "rawhide" ]]; then
   fver="rawhide"
 else
   fver="${fver#f}"
 fi
-for arch in x86_64 i386
+for arch in $arch
 do
   mkdir anaconda/repo/$arch
   mock -r fedora-$fver-$arch --rebuild anaconda/*.src.rpm --resultdir anaconda/repo/$arch $verbose
@@ -57,5 +45,7 @@ do
 done
 cp anaconda/*.src.rpm anaconda/repo/SRPMS/
 createrepo anaconda/repo/SRPMS
+
+exit 0
 
 # vim:expandtab:tabstop=2:shiftwidth=2:softtabstop=2

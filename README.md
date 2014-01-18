@@ -5,8 +5,5 @@ Tools for Fedora translators.
 
 ## Typical usage: ##
 ```
-$ ./anaconda_prepare.sh -f f20
-$ ./anaconda_build.sh -f f20
-$ ./kickstart_prepare.sh -f f20
-# ./kickstart_build.sh -f f20
+$ ./fedora-i18n.sh -v -f f20 -a x86_64
 ```

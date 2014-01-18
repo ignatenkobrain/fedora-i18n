@@ -9,42 +9,35 @@
 # any later version.
 # See http://www.gnu.org/copyleft/gpl.html for the full text of the license.
 
-source `dirname $(readlink -f $0)`/check_pkgs.sh
-check_pkgs "livecd-tools"
-if [ "$?" -eq "1" ]; then
-  exit 1
-fi
-
-print_help ()
-{
-  # XXX: implement help
-  exit 0
-}
-
-while getopts "hdf:" opts; do
+while getopts "vf:a:" opts; do
   case "$opts" in
-    h)
-      print_help
-      ;;
-    d)
-      set -x
+    v)
       verbose="--verbose"
       ;;
     f)
-      fver=${OPTARG}
+      fver=$OPTARG
+      ;;
+    a)
+      arch="$OPTARG"
       ;;
     *)
-      print_help
+      echo "Wrong Usage!"
+      exit 1
       ;;
     esac
 done
 
-if [ -z "$fver" ]; then
+if [[ "$fver" == "rawhide" ]]; then
   fver="rawhide"
   release="$fver"
 else
   release="${fver#f}"
 fi
-livecd-creator $verbose --config=./temp.ks --fslabel=$fver-LiveCD-`date "+%d%m%Y"` --cache=/var/cache/livecd --releasever=$release
+for arch in $arch
+do
+  setarch $arch livecd-creator $verbose --config=./temp.ks --fslabel=$fver-LiveCD-`date "+%d%m%Y"`_$arch --cache=/var/cache/livecd --releasever=$release
+done
+
+exit 0
 
 # vim:expandtab:tabstop=2:shiftwidth=2:softtabstop=2

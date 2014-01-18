@@ -9,37 +9,20 @@
 # any later version.
 # See http://www.gnu.org/copyleft/gpl.html for the full text of the license.
 
-source `dirname $(readlink -f $0)`/check_pkgs.sh
-check_pkgs "git"
-if [ "$?" -eq "1" ]; then
-  exit 1
-fi
-
-print_help ()
-{
-  # XXX: implement help
-  exit 0
-}
-
-while getopts "hdf:" opts; do
+while getopts "f:" opts; do
   case "$opts" in
-    h)
-      print_help
-      ;;
-    d)
-      set -x
-      ;;
     f)
-      fver=${OPTARG}
+      fver=$OPTARG
       ;;
     *)
-      print_help
+      echo "Wrong usage!"
+      exit 1
       ;;
     esac
 done
 
-if [ -z "$fver" ]; then
-  fver=master
+if [[ "$fver" == "rawhide" ]]; then
+  fver="master"
 fi
 if [ -d "spin-kickstarts" ]; then
   rm -rf "spin-kickstarts"
