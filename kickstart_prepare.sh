@@ -31,6 +31,7 @@ git clone https://git.fedorahosted.org/git/spin-kickstarts.git -b "$fver"
 
 cat > temp.ks << EOF
 repo --name=anaconda --baseurl=file://`pwd`/anaconda/repo/\$basearch --cost=9999
+repo --name=anaconda-source --baseurl=file://`pwd`/anaconda/repo/SRPMS --cost=9999
 %include ./spin-kickstarts/fedora-install-fedora.ks
 EOF
 

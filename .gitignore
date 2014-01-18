@@ -1,4 +1,5 @@
 anaconda/
 spin-kickstarts/
 temp.ks
-*.iso
+tmp/
+iso/

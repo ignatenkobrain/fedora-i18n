@@ -11,7 +11,7 @@
 
 source `dirname $(readlink -f $0)`/check_pkgs.sh
 PKGS_ANACONDA="transifex-client fedpkg mock createrepo"
-PKGS_KICKSTART="livecd-tools sudo"
+PKGS_KICKSTART="pungi sudo"
 check_pkgs $PKGS_ANACONDA $PKGS_KICKSTART
 if [ "$?" -eq "1" ]; then
   exit 1
