@@ -47,6 +47,10 @@ if [ ! -d iso ]; then
   mkdir iso
 fi
 dir_iso=`find tmp/ -type d -name iso`
+if [ -z "$dir_iso" ]; then
+  echo "WTF?! ISOs dir not found!"
+  exit 1
+fi
 mv "$dir_iso"/* iso/
 
 exit 0

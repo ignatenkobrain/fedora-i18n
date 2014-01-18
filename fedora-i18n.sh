@@ -63,7 +63,7 @@ fi
 `dirname $(readlink -f $0)`/anaconda_prepare.sh -f $fver
 `dirname $(readlink -f $0)`/anaconda_build.sh "$v" -f $fver -a "$arch"
 `dirname $(readlink -f $0)`/kickstart_prepare.sh -f $fver
-sudo `dirname $(readlink -f $0)`/kickstart_build.sh "$v" -f $fver -a "$arch"
+`dirname $(readlink -f $0)`/kickstart_build.sh "$v" -f $fver -a "$arch"
 
 exit 0
 
