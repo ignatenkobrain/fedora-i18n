@@ -40,7 +40,7 @@ for arch in $arch
 do
   mkdir anaconda/repo/$arch
   mock -r fedora-$fver-$arch --rebuild anaconda/*.src.rpm --resultdir anaconda/repo/$arch $verbose
-  find anaconda/repo/$arch -type f -name "*.src.rpm" -delete
+  find anaconda/repo/$arch -type f -name "*.src.rpm" -or -name "*-debuginfo*.rpm" -delete
   createrepo anaconda/repo/$arch
 done
 cp anaconda/*.src.rpm anaconda/repo/SRPMS/
