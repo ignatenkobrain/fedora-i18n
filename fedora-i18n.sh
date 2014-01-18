@@ -25,7 +25,7 @@ print_help ()
   echo "    -h show this help text"
   echo "    -v enable verbose mode"
   echo "    -f specify fedora version. for example: f20"
-  echo "    -a arches separated by space. for example: x86_64 i386"
+  echo "    -a (disabled) arches separated by space. for example: x86_64 i386"
   exit $EXIT_CODE
 }
 
@@ -40,7 +40,8 @@ while getopts "hva:f:" opts; do
       v="-v"
       ;;
     a)
-      arch="$OPTARG"
+      # XXX: implement arch-builds (kickstart_build.sh:41)
+      #arch="$OPTARG"
       ;;
     f)
       fver=$OPTARG
@@ -53,7 +54,7 @@ while getopts "hva:f:" opts; do
 done
 
 if [ -z "$arch" ]; then
-  arch="x86_64 i386"
+  arch=`arch`
 fi
 if [ -z "$fver" ]; then
   fver="rawhide"
